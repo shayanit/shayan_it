@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shayan Taghinezhad | AI Application Engineer</title>
+    <style>
+        /* Import a clean, modern sans-serif font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #050914; /* Deep, tech-inspired dark background */
+            color: #e2e8f0;
+            overflow: hidden; /* Prevent scrolling, keeps it a strict single page */
+        }
+
+        /* Neural Network Canvas Background */
+        #ai-network {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Main Content Container */
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Profile Card */
+        .profile-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 650px;
+            text-align: left;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.1);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            /* Gradient text effect */
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #94a3b8;
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Pulsing AI glowing dot next to the title */
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8;
+            animation: pulse 2s infinite;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-weight: 300;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8; }
+            50% { box-shadow: 0 0 15px #38bdf8, 0 0 30px #38bdf8; }
+            100% { box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8; }
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 600px) {
+            .profile-card { padding: 2rem; }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.1rem; }
+            p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for the animated AI background -->
+    <canvas id="ai-network"></canvas>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="profile-card">
+            <h1>Shayan Taghinezhad</h1>
+            <h2>AI Application Engineer</h2>
+            <p>
+                AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.
+            </p>
+        </div>
+    </div>
+
+    <!-- Script for the interactive background -->
+    <script>
+        const canvas = document.getElementById('ai-network');
+        const ctx = canvas.getContext('2d');
+
+        let width, height, particles;
+
+        // Initialize canvas and particles
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+
+            // Number of particles based on screen size
+            const particleCount = Math.floor((width * height) / 12000); 
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.7, // X velocity
+                    vy: (Math.random() - 0.5) * 0.7, // Y velocity
+                    radius: Math.random() * 1.5 + 0.5
+                });
+            }
+        }
+
+        // Draw and animate the particles
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+
+                // Update positions
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Bounce off the screen edges
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                // Draw the node (particle)
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw connecting lines to nearby nodes to form a network
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    // Connect if close enough
+                    if (distance < 130) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        // Make line more transparent the further away they are
+                        let opacity = 0.2 * (1 - distance / 130);
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
+                        ctx.stroke();
+                    }
+                }
+            }
+            // Loop the animation
+            requestAnimationFrame(draw);
+        }
+
+        // Re-initialize on window resize to prevent stretching
+        window.addEventListener('resize', init);
+
+        // Start the background animation
+        init();
+        draw();
+    </script>
+</body>
+</html>
