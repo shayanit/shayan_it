@@ -91,30 +91,67 @@ p {
     font-weight: 300;
 }
 
-/* AI Themed Contact Button */
-.contact-btn {
+/* CTA Button Row */
+.cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     margin-top: 2rem;
+}
+
+/* Contact Button */
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.8rem 1.8rem;
     font-size: 1rem;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     color: #ffffff;
-    background: linear-gradient(135deg, #38bdf8, #4f46e5);
-    border: none;
+    background: #0891b2;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(8, 145, 178, 0.35);
 }
 
 .contact-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5);
+    background: #0e7490;
+    box-shadow: 0 8px 25px rgba(8, 145, 178, 0.5);
 }
 
 .contact-btn:active {
+    transform: translateY(0);
+}
+
+.linkedin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+    text-decoration: none;
+    background: #0a66c2;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(10, 102, 194, 0.35);
+}
+
+.linkedin-btn:hover {
+    transform: translateY(-2px);
+    background: #004182;
+    box-shadow: 0 8px 25px rgba(10, 102, 194, 0.5);
+}
+
+.linkedin-btn:active {
     transform: translateY(0);
 }
 
@@ -136,5 +173,7 @@ p {
     h1 { font-size: 2.2rem; }
     h2 { font-size: 1.1rem; }
     p { font-size: 1rem; }
-    .contact-btn { width: 100%; margin-top: 1.5rem; }
+    .cta-buttons { margin-top: 1.5rem; flex-direction: column; }
+    .contact-btn,
+    .linkedin-btn { width: 100%; }
 }
