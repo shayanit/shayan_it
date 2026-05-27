@@ -3,6 +3,8 @@ const hiddenInput = document.getElementById('hidden-input');
 const visualInput = document.getElementById('visual-input');
 const history = document.getElementById('history');
 const terminal = document.getElementById('terminal');
+const fileIcon = document.querySelector('.file-icon');
+const closeBtn = document.querySelector('.close-btn');
 
 let isTyping = false;
 const emailUser = 'me';
@@ -11,25 +13,24 @@ const emailTld = 'it';
 const linkedinUrl = 'https://www.linkedin.com/in/shayanit/';
 
 // Updated CV Text using your provided copy
-const cvText = `=======================================================
-                   SHAYAN TAGHINEZHAD                  
-                 AI Application Engineer               
-=======================================================
+const cvText = `SHAYAN TAGHINEZHAD
+AI Application Engineer
 
-AI Application Engineer with experience in Python and 
-JavaScript development. Holds a Master’s degree in 
-Computer Engineering, with expertise in building 
-full-stack and AI software solutions. Passionate about 
-designing scalable, efficient, and optimized systems to 
-address real-world challenges.
-=======================================================`;
+AI Application Engineer with experience in Python and
+JavaScript development. Holds a Master's degree in
+Computer Engineering, with expertise in building
+full-stack and AI software solutions. Passionate about
+designing scalable, efficient, and optimized systems to
+address real-world challenges.`;
 
 // --- Window Controls ---
 function closeTerminal() {
+  document.body.classList.remove('terminal-open');
   windowContainer.style.display = 'none';
 }
 
 async function openFile() {
+  document.body.classList.add('terminal-open');
   windowContainer.style.display = 'flex';
   focusTerminal();
 
@@ -137,6 +138,20 @@ function focusTerminal() {
   }
 }
 
+function isMobileView() {
+  return window.matchMedia('(max-width: 768px)').matches;
+}
+
+function syncLayoutWithViewport() {
+  if (isMobileView()) {
+    windowContainer.style.display = document.body.classList.contains('terminal-open') ? 'flex' : 'none';
+    return;
+  }
+
+  document.body.classList.add('terminal-open');
+  windowContainer.style.display = 'flex';
+}
+
 function escapeHTML(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -164,7 +179,31 @@ function buildLinkedinLink() {
   return link;
 }
 
+function bindUiHandlers() {
+  if (fileIcon) {
+    fileIcon.addEventListener('click', () => {
+      openFile();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      closeTerminal();
+    });
+  }
+
+  terminal.addEventListener('click', () => {
+    focusTerminal();
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  hiddenInput.focus();
+  bindUiHandlers();
+  syncLayoutWithViewport();
+  if (!isMobileView()) {
+    hiddenInput.focus();
+  }
 });
+
+window.addEventListener('resize', syncLayoutWithViewport);
 

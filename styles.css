@@ -31,6 +31,7 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -42,6 +43,8 @@ body {
   align-items: center;
   width: 80px;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   padding: 10px;
   border-radius: 5px;
   transition: background 0.2s;
@@ -80,6 +83,7 @@ body {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid #1a4a57;
+  z-index: 10;
 }
 
 #title-bar {
@@ -195,5 +199,33 @@ body {
 
 .typing-in-progress .prompt-line {
   display: none;
+}
+
+@media (max-width: 768px) {
+  #desktop {
+    top: 16px;
+    left: 16px;
+    z-index: 20;
+  }
+
+  #window-container {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+    border: none;
+    display: none;
+  }
+
+  body.terminal-open #desktop {
+    display: none;
+  }
+
+  body.terminal-open #window-container {
+    display: flex;
+  }
 }
 
