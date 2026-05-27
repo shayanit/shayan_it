@@ -3,28 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Shayan Taghinezhad | AI Application Engineer</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="title" content="Shayan Taghinezhad | AI Application Engineer">
+    <meta name="description" content="AI Application Engineer with experience in Python and JavaScript development, building full-stack and AI software solutions.">
+    <meta name="keywords" content="Shayan Taghinezhad, AI Application Engineer, Software Engineer, Python, JavaScript, Full-Stack, Turin">
+    <meta name="author" content="Shayan Taghinezhad">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Shayan Taghinezhad | AI Application Engineer">
+    <meta property="og:description" content="Explore my interactive terminal portfolio. Building scalable full-stack solutions and optimizing AI systems.">
+    <meta property="og:image" content="https://yourdomain.com/preview-image.jpg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Shayan Taghinezhad | AI Application Engineer">
+    <meta property="twitter:description" content="Explore my interactive terminal portfolio. Building scalable full-stack solutions and optimizing AI systems.">
+    <meta property="twitter:image" content="https://yourdomain.com/preview-image.jpg">
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <canvas id="ai-network"></canvas>
+<div id="seo-fallback" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
+    <h1>Shayan Taghinezhad</h1>
+    <h2>AI Application Engineer</h2>
+    <p>AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.</p>
+</div>
+<noscript>
+    <div style="color: white; padding: 20px;">
+        To view the interactive portfolio, please enable JavaScript. <br><br>
+        <strong>Shayan Taghinezhad - AI Application Engineer</strong><br>
+        AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.
+    </div>
+</noscript>
 
-    <div class="container">
-        <div class="profile-card">
-            <h1>Shayan Taghinezhad</h1>
-            <h2>AI Application Engineer</h2>
-            <p>
-                AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.
-            </p>
+<div id="desktop">
+    <div class="file-icon" onclick="openFile()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </svg>
+        <div class="file-name">cv.txt</div>
+    </div>
+</div>
 
-            <div class="cta-buttons">
-                <button id="secure-contact" class="contact-btn">Contact Me</button>
-                <a href="https://www.linkedin.com/in/shayanit/" class="linkedin-btn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+<div id="window-container">
+    <div id="title-bar">
+        <div class="window-controls">
+            <div class="control-btn close-btn" onclick="closeTerminal()"></div>
+            <div class="control-btn min-btn"></div>
+            <div class="control-btn max-btn"></div>
+        </div>
+        <div class="window-title">guest@ubuntu: ~</div>
+    </div>
+    
+    <div id="terminal" onclick="focusTerminal()">
+        <div id="history"></div>
+        
+        <div class="prompt-line" id="prompt-container">
+            <span class="prompt-prefix">guest@ubuntu:~$</span>
+            <div class="input-container">
+                <input type="text" id="hidden-input" autofocus autocomplete="off" spellcheck="false">
+                <span id="visual-input"></span><span class="cursor"></span>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>

@@ -1,72 +1,170 @@
-// --- Bot-Proof Email Obfuscation ---
-document.getElementById('secure-contact').addEventListener('click', function() {
-    // We break the email apart so scrapers looking for the '@' symbol or 'mailto:' links won't find it
-    const user = 'me';
-    const domain = 'shayan.it';
-    // Assemble and execute the mailto command
-    window.location.href = 'mailto:' + user + '@' + domain;
+const windowContainer = document.getElementById('window-container');
+const hiddenInput = document.getElementById('hidden-input');
+const visualInput = document.getElementById('visual-input');
+const history = document.getElementById('history');
+const terminal = document.getElementById('terminal');
+
+let isTyping = false;
+const emailUser = 'me';
+const emailDomain = 'shayan';
+const emailTld = 'it';
+const linkedinUrl = 'https://www.linkedin.com/in/shayanit/';
+
+// Updated CV Text using your provided copy
+const cvText = `=======================================================
+                   SHAYAN TAGHINEZHAD                  
+                 AI Application Engineer               
+=======================================================
+
+AI Application Engineer with experience in Python and 
+JavaScript development. Holds a Master’s degree in 
+Computer Engineering, with expertise in building 
+full-stack and AI software solutions. Passionate about 
+designing scalable, efficient, and optimized systems to 
+address real-world challenges.
+=======================================================`;
+
+// --- Window Controls ---
+function closeTerminal() {
+  windowContainer.style.display = 'none';
+}
+
+async function openFile() {
+  windowContainer.style.display = 'flex';
+  focusTerminal();
+
+  if (history.children.length === 0 && !isTyping) {
+    await simulateTypingCommand('cat cv.txt');
+  }
+}
+
+async function simulateTypingCommand(cmd) {
+  hiddenInput.disabled = true;
+  isTyping = true;
+
+  await new Promise(r => setTimeout(r, 400));
+
+  for (let i = 0; i < cmd.length; i++) {
+    visualInput.textContent += cmd[i];
+    await new Promise(r => setTimeout(r, Math.random() * 50 + 30));
+  }
+
+  await new Promise(r => setTimeout(r, 200));
+
+  hiddenInput.value = cmd;
+  isTyping = false;
+  hiddenInput.disabled = false;
+
+  const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+  hiddenInput.dispatchEvent(enterEvent);
+}
+
+// --- Terminal Logic ---
+hiddenInput.addEventListener('input', () => {
+  if (!isTyping) {
+    visualInput.textContent = hiddenInput.value;
+    terminal.scrollTop = terminal.scrollHeight;
+  }
 });
 
-// --- AI Background Network Animation ---
-const canvas = document.getElementById('ai-network');
-const ctx = canvas.getContext('2d');
+hiddenInput.addEventListener('keydown', async (e) => {
+  if (e.key === 'Enter' && !isTyping) {
+    const command = hiddenInput.value.trim();
 
-let width, height, particles;
+    if (command === "") return;
 
-function init() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    particles = [];
+    const commandEcho = document.createElement('div');
+    commandEcho.className = 'line';
+    commandEcho.innerHTML = `<span class="prompt-prefix">guest@ubuntu:~$</span> <span style="user-select: text;">${escapeHTML(hiddenInput.value)}</span>`;
+    history.appendChild(commandEcho);
 
-    const particleCount = Math.floor((width * height) / 12000);
+    const response = document.createElement('div');
+    response.className = 'line';
+    history.appendChild(response);
 
-    for (let i = 0; i < particleCount; i++) {
-        particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 0.7,
-            vy: (Math.random() - 0.5) * 0.7,
-            radius: Math.random() * 1.5 + 0.5
-        });
+    hiddenInput.value = '';
+    visualInput.textContent = '';
+
+    let textToType = '';
+    let appendEmailLink = false;
+    if (command === 'cat cv.txt') {
+      textToType = `${cvText}\n\nEmail: `;
+      response.style.color = "var(--text-color)";
+      appendEmailLink = true;
+    } else {
+      textToType = `command not found: ${command}\nDid you mean "cat cv.txt"?`;
+      response.style.color = "var(--error-color)";
     }
+
+    await typeOutText(response, textToType);
+    if (appendEmailLink) {
+      response.appendChild(buildEmailLink());
+      response.appendChild(document.createTextNode('\nLinkedin: '));
+      response.appendChild(buildLinkedinLink());
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  }
+});
+
+async function typeOutText(element, text) {
+  isTyping = true;
+  terminal.classList.add('typing-in-progress');
+  hiddenInput.disabled = true;
+
+  const typingSpeed = 5;
+
+  for (let i = 0; i < text.length; i++) {
+    element.textContent += text.charAt(i);
+    terminal.scrollTop = terminal.scrollHeight;
+
+    if (text.charAt(i) === '\n') {
+      await new Promise(r => setTimeout(r, typingSpeed * 10));
+    } else {
+      await new Promise(r => setTimeout(r, typingSpeed));
+    }
+  }
+
+  isTyping = false;
+  hiddenInput.disabled = false;
+  terminal.classList.remove('typing-in-progress');
+  hiddenInput.focus();
+  terminal.scrollTop = terminal.scrollHeight;
 }
 
-function draw() {
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
-
-    for (let i = 0; i < particles.length; i++) {
-        let p = particles[i];
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        for (let j = i + 1; j < particles.length; j++) {
-            let p2 = particles[j];
-            let dx = p.x - p2.x;
-            let dy = p.y - p2.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 130) {
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p2.x, p2.y);
-                let opacity = 0.2 * (1 - distance / 130);
-                ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
-                ctx.stroke();
-            }
-        }
-    }
-    requestAnimationFrame(draw);
+function focusTerminal() {
+  if (!isTyping && windowContainer.style.display !== 'none') {
+    hiddenInput.focus();
+  }
 }
 
-window.addEventListener('resize', init);
-init();
-draw();
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function buildEmailLink() {
+  const email = `${emailUser}@${emailDomain}.${emailTld}`;
+  const link = document.createElement('a');
+  link.href = `mailto:${email}`;
+  link.textContent = `${emailUser} [at] ${emailDomain} [dot] ${emailTld}`;
+  link.style.color = 'var(--prompt-color)';
+  link.style.textDecoration = 'underline';
+  link.style.userSelect = 'text';
+  return link;
+}
+
+function buildLinkedinLink() {
+  const link = document.createElement('a');
+  link.href = linkedinUrl;
+  link.textContent = linkedinUrl;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.style.color = 'var(--prompt-color)';
+  link.style.textDecoration = 'underline';
+  link.style.userSelect = 'text';
+  return link;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  hiddenInput.focus();
+});
+
