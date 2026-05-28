@@ -35,6 +35,8 @@
 </head>
 <body>
 
+<div id="desktop-wallpaper" aria-hidden="true"></div>
+
 <!-- keep in sync with #profile-data; email is JS-only -->
 <div id="seo-fallback" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
     <h1>Shayan Taghinezhad</h1>
@@ -95,7 +97,8 @@
 <!-- Full-screen black overlay triggered by rm -rf / -->
 <div id="blackout" class="is-hidden" aria-hidden="true"></div>
 
-<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/trianglify@4.1.1/dist/trianglify.bundle.js" defer></script>
+<script src="script.js" defer></script>
 
 </body>
 </html>

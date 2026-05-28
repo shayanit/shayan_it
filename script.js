@@ -347,9 +347,43 @@ function onViewportResize() {
 }
 
 // =============================================================================
+// Desktop wallpaper (Trianglify: Canonical Aubergine → Toledo)
+// =============================================================================
+
+const DESKTOP_WALLPAPER_COLORS = ['#772953', '#2C001E'];
+let desktopWallpaperResizeTimer;
+
+function renderDesktopWallpaper() {
+  const container = document.getElementById('desktop-wallpaper');
+  if (!container || typeof trianglify !== 'function') return;
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const pattern = trianglify({
+    width,
+    height,
+    cellSize: Math.round(Math.min(width, height) / 14),
+    variance: 0.75,
+    xColors: DESKTOP_WALLPAPER_COLORS,
+    yColors: 'match',
+  });
+
+  container.replaceChildren(pattern.toCanvas());
+}
+
+function initDesktopWallpaper() {
+  renderDesktopWallpaper();
+  window.addEventListener('resize', () => {
+    clearTimeout(desktopWallpaperResizeTimer);
+    desktopWallpaperResizeTimer = setTimeout(renderDesktopWallpaper, 150);
+  });
+}
+
+// =============================================================================
 // Init — terminal hidden on load (desktop and mobile)
 // =============================================================================
 
+initDesktopWallpaper();
 bindDesktopIcons();
 bindTerminalClose();
 bindTerminalDrag();
