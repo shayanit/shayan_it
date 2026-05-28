@@ -6,69 +6,94 @@
     
     <title>Shayan Taghinezhad | AI Application Engineer</title>
     <meta name="title" content="Shayan Taghinezhad | AI Application Engineer">
-    <meta name="description" content="AI Application Engineer with experience in Python and JavaScript development, building full-stack and AI software solutions.">
-    <meta name="keywords" content="Shayan Taghinezhad, AI Application Engineer, Software Engineer, Python, JavaScript, Full-Stack, Turin">
+    <meta name="description" content="AI Application Engineer in Turin, Italy. Python, JavaScript. M.Sc. Computer Engineering. Interactive terminal portfolio.">
+    <meta name="keywords" content="Shayan Taghinezhad, AI Application Engineer, Turin, Python, JavaScript, Computer Engineering">
     <meta name="author" content="Shayan Taghinezhad">
     <meta name="robots" content="index, follow">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Shayan Taghinezhad | AI Application Engineer">
-    <meta property="og:description" content="Explore my interactive terminal portfolio. Building scalable full-stack solutions and optimizing AI systems.">
+    <meta property="og:description" content="AI Application Engineer in Turin, Italy. Python, JavaScript. M.Sc. Computer Engineering. Interactive terminal portfolio.">
     <meta property="og:image" content="https://yourdomain.com/preview-image.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Shayan Taghinezhad | AI Application Engineer">
-    <meta property="twitter:description" content="Explore my interactive terminal portfolio. Building scalable full-stack solutions and optimizing AI systems.">
+    <meta property="twitter:description" content="AI Application Engineer in Turin, Italy. Python, JavaScript. M.Sc. Computer Engineering. Interactive terminal portfolio.">
     <meta property="twitter:image" content="https://yourdomain.com/preview-image.jpg">
+
+    <script type="application/json" id="profile-data">
+{
+  "name": "Shayan Taghinezhad",
+  "role": "AI Application Engineer",
+  "location": "Turin, Italy",
+  "stack": "Python, JavaScript",
+  "education": "M.Sc. Computer Engineering"
+}
+    </script>
 
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<!-- keep in sync with #profile-data; email is JS-only -->
 <div id="seo-fallback" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
     <h1>Shayan Taghinezhad</h1>
-    <h2>AI Application Engineer</h2>
-    <p>AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.</p>
+    <dl>
+        <dt>Role</dt><dd>AI Application Engineer</dd>
+        <dt>Location</dt><dd>Turin, Italy</dd>
+        <dt>Stack</dt><dd>Python, JavaScript</dd>
+        <dt>Education</dt><dd>M.Sc. Computer Engineering</dd>
+    </dl>
 </div>
 <noscript>
     <div style="color: white; padding: 20px;">
-        To view the interactive portfolio, please enable JavaScript. <br><br>
-        <strong>Shayan Taghinezhad - AI Application Engineer</strong><br>
-        AI Application Engineer with experience in Python and JavaScript development. Holds a Master’s degree in Computer Engineering, with expertise in building full-stack and AI software solutions. Passionate about designing scalable, efficient, and optimized systems to address real-world challenges.
+        Shayan Taghinezhad<br>
+        Role: AI Application Engineer<br>
+        Location: Turin, Italy<br>
+        Stack: Python, JavaScript<br>
+        Education: M.Sc. Computer Engineering<br><br>
+        Enable JavaScript to use the interactive terminal portfolio.
     </div>
 </noscript>
 
+<!-- Desktop shortcuts: Terminal opens shell; info opens shell + neofetch -->
 <div id="desktop">
-    <div class="file-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+    <div class="file-icon" id="terminal-shortcut">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zM7.5 15l-1.41-1.41L8.67 11 6.09 8.41 7.5 7l4 4-4 4z"/>
         </svg>
-        <div class="file-name">cv.txt</div>
+        <div class="file-name">Terminal</div>
+    </div>
+    <div class="file-icon" id="info-shortcut">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        <div class="file-name">info</div>
     </div>
 </div>
 
-<div id="window-container">
-    <div id="title-bar">
+<!-- Single draggable terminal window (hidden until opened from desktop) -->
+<div id="terminal-shell" class="is-hidden">
+    <div class="title-bar" id="terminal-title-bar">
         <div class="window-controls">
-            <div class="control-btn close-btn"></div>
-            <div class="control-btn min-btn"></div>
-            <div class="control-btn max-btn"></div>
+            <div class="control-btn close-btn" title="Close"></div>
         </div>
         <div class="window-title">guest@ubuntu: ~</div>
     </div>
-    
-    <div id="terminal">
+    <div class="window-body" id="terminal">
         <div id="history"></div>
-        
         <div class="prompt-line" id="prompt-container">
             <span class="prompt-prefix">guest@ubuntu:~$</span>
             <div class="input-container">
-                <input type="text" id="hidden-input" autofocus autocomplete="off" spellcheck="false">
+                <input type="text" id="hidden-input" autocomplete="off" spellcheck="false">
                 <span id="visual-input"></span><span class="cursor"></span>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Full-screen black overlay triggered by rm -rf / -->
+<div id="blackout" class="is-hidden" aria-hidden="true"></div>
 
 <script src="script.js"></script>
 

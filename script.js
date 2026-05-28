@@ -1,209 +1,357 @@
-const windowContainer = document.getElementById('window-container');
-const hiddenInput = document.getElementById('hidden-input');
-const visualInput = document.getElementById('visual-input');
-const history = document.getElementById('history');
-const terminal = document.getElementById('terminal');
-const fileIcon = document.querySelector('.file-icon');
-const closeBtn = document.querySelector('.close-btn');
+/**
+ * Interactive terminal portfolio — simplified single-window UI.
+ * Desktop: Terminal (open shell) and info (open shell + neofetch).
+ */
 
-let isTyping = false;
+// =============================================================================
+// Configuration & profile (neofetch banner)
+// =============================================================================
+
 const emailUser = 'me';
 const emailDomain = 'shayan';
 const emailTld = 'it';
-const linkedinUrl = 'https://www.linkedin.com/in/shayanit/';
 
-// Updated CV Text using your provided copy
-const cvText = `SHAYAN TAGHINEZHAD
-AI Application Engineer
+const profile = JSON.parse(document.getElementById('profile-data').textContent);
 
-AI Application Engineer with experience in Python and
-JavaScript development. Holds a Master's degree in
-Computer Engineering, with expertise in building
-full-stack and AI software solutions. Passionate about
-designing scalable, efficient, and optimized systems to
-address real-world challenges.`;
-
-// --- Window Controls ---
-function closeTerminal() {
-  document.body.classList.remove('terminal-open');
-  windowContainer.style.display = 'none';
+/** Hostname line shown at top of neofetch output. */
+function getHostLine() {
+  return `${emailUser}@${emailDomain}.${emailTld}`;
 }
 
-async function openFile() {
-  document.body.classList.add('terminal-open');
-  windowContainer.style.display = 'flex';
-  focusTerminal();
-
-  if (history.children.length === 0 && !isTyping) {
-    await simulateTypingCommand('cat cv.txt');
-  }
+/** Multi-line system info block for the neofetch command. */
+function buildNeofetchBanner() {
+  return `${getHostLine()}
+------------------
+Role: ${profile.role}
+Location: ${profile.location}
+Stack: ${profile.stack}
+Education: ${profile.education}`;
 }
 
-async function simulateTypingCommand(cmd) {
-  hiddenInput.disabled = true;
-  isTyping = true;
+const NEOFETCH_BANNER = buildNeofetchBanner();
 
-  await new Promise(r => setTimeout(r, 400));
+const COMMAND_HELP = `Available commands:
+  help        Show this help message
+  clear       Clear terminal history
+  whoami      Print current user
+  date        Print system date and time
+  neofetch    Display system info
+  rm -rf /    Remove everything`;
 
-  for (let i = 0; i < cmd.length; i++) {
-    visualInput.textContent += cmd[i];
-    await new Promise(r => setTimeout(r, Math.random() * 50 + 30));
-  }
+// =============================================================================
+// DOM references
+// =============================================================================
 
-  await new Promise(r => setTimeout(r, 200));
+const terminalShell = document.getElementById('terminal-shell');
+const terminalTitleBar = document.getElementById('terminal-title-bar');
+const terminalCloseBtn = terminalShell?.querySelector('.close-btn');
+const terminalShortcut = document.getElementById('terminal-shortcut');
+const infoShortcut = document.getElementById('info-shortcut');
+const hiddenInput = document.getElementById('hidden-input');
+const visualInput = document.getElementById('visual-input');
+const historyEl = document.getElementById('history');
+const terminal = document.getElementById('terminal');
+const blackout = document.getElementById('blackout');
 
-  hiddenInput.value = cmd;
-  isTyping = false;
-  hiddenInput.disabled = false;
+// Layout constants for centering and drag clamping
+const TITLE_BAR_HEIGHT = 35;
+const DEFAULT_SHELL_WIDTH = 700;
+const DEFAULT_SHELL_HEIGHT_RATIO = 0.65;
 
-  const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-  hiddenInput.dispatchEvent(enterEvent);
-}
-
-// --- Terminal Logic ---
-hiddenInput.addEventListener('input', () => {
-  if (!isTyping) {
-    visualInput.textContent = hiddenInput.value;
-    terminal.scrollTop = terminal.scrollHeight;
-  }
-});
-
-hiddenInput.addEventListener('keydown', async (e) => {
-  if (e.key === 'Enter' && !isTyping) {
-    const command = hiddenInput.value.trim();
-
-    if (command === "") return;
-
-    const commandEcho = document.createElement('div');
-    commandEcho.className = 'line';
-    commandEcho.innerHTML = `<span class="prompt-prefix">guest@ubuntu:~$</span> <span style="user-select: text;">${escapeHTML(hiddenInput.value)}</span>`;
-    history.appendChild(commandEcho);
-
-    const response = document.createElement('div');
-    response.className = 'line';
-    history.appendChild(response);
-
-    hiddenInput.value = '';
-    visualInput.textContent = '';
-
-    let textToType = '';
-    let appendEmailLink = false;
-    if (command === 'cat cv.txt') {
-      textToType = `${cvText}\n\nEmail: `;
-      response.style.color = "var(--text-color)";
-      appendEmailLink = true;
-    } else {
-      textToType = `command not found: ${command}\nDid you mean "cat cv.txt"?`;
-      response.style.color = "var(--error-color)";
-    }
-
-    await typeOutText(response, textToType);
-    if (appendEmailLink) {
-      response.appendChild(buildEmailLink());
-      response.appendChild(document.createTextNode('\nLinkedin: '));
-      response.appendChild(buildLinkedinLink());
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-  }
-});
-
-async function typeOutText(element, text) {
-  isTyping = true;
-  terminal.classList.add('typing-in-progress');
-  hiddenInput.disabled = true;
-
-  const typingSpeed = 5;
-
-  for (let i = 0; i < text.length; i++) {
-    element.textContent += text.charAt(i);
-    terminal.scrollTop = terminal.scrollHeight;
-
-    if (text.charAt(i) === '\n') {
-      await new Promise(r => setTimeout(r, typingSpeed * 10));
-    } else {
-      await new Promise(r => setTimeout(r, typingSpeed));
-    }
-  }
-
-  isTyping = false;
-  hiddenInput.disabled = false;
-  terminal.classList.remove('typing-in-progress');
-  hiddenInput.focus();
-  terminal.scrollTop = terminal.scrollHeight;
-}
-
-function focusTerminal() {
-  if (!isTyping && windowContainer.style.display !== 'none') {
-    hiddenInput.focus();
-  }
-}
-
+/** True when viewport is treated as mobile (full-screen terminal, no drag). */
 function isMobileView() {
   return window.matchMedia('(max-width: 768px)').matches;
 }
 
-function syncLayoutWithViewport() {
-  if (isMobileView()) {
-    windowContainer.style.display = document.body.classList.contains('terminal-open') ? 'flex' : 'none';
+/** Usable desktop area for positioning the terminal window. */
+function getViewportBounds() {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+}
+
+// =============================================================================
+// Terminal window visibility
+// =============================================================================
+
+let hasBeenOpened = false;
+
+function isTerminalOpen() {
+  return terminalShell && !terminalShell.classList.contains('is-hidden');
+}
+
+/** Focus the hidden input when the terminal is open and input is enabled. */
+function focusTerminal() {
+  if (isTerminalOpen() && !hiddenInput.disabled) {
+    hiddenInput.focus();
+  }
+}
+
+/** Sync body class on mobile so desktop icons hide while terminal is open. */
+function syncMobileBodyClass() {
+  if (!isMobileView()) {
+    document.body.classList.remove('terminal-open');
     return;
   }
+  document.body.classList.toggle('terminal-open', isTerminalOpen());
+}
 
-  document.body.classList.add('terminal-open');
-  windowContainer.style.display = 'flex';
+/** Center the shell on first open (desktop only; mobile uses CSS full-screen). */
+function centerTerminalShell() {
+  if (isMobileView() || !terminalShell) return;
+
+  const bounds = getViewportBounds();
+  const width = Math.min(DEFAULT_SHELL_WIDTH, bounds.width - 40);
+  const height = Math.min(bounds.height * DEFAULT_SHELL_HEIGHT_RATIO, bounds.height - 40);
+  const left = (bounds.width - width) / 2;
+  const top = (bounds.height - height) / 2;
+
+  terminalShell.style.left = `${left}px`;
+  terminalShell.style.top = `${top}px`;
+  terminalShell.style.width = `${width}px`;
+  terminalShell.style.height = `${height}px`;
+}
+
+/** Keep dragged window at least partially on screen. */
+function ensureTerminalOnScreen() {
+  if (isMobileView() || !terminalShell || !isTerminalOpen()) return;
+
+  const rect = terminalShell.getBoundingClientRect();
+  const bounds = getViewportBounds();
+  let left = rect.left;
+  let top = rect.top;
+
+  left = Math.max(-rect.width + 80, Math.min(left, bounds.width - 80));
+  top = Math.max(0, Math.min(top, bounds.height - TITLE_BAR_HEIGHT));
+
+  terminalShell.style.left = `${left}px`;
+  terminalShell.style.top = `${top}px`;
+}
+
+/** Show terminal; center on first open. Does not run any command. */
+function openTerminal() {
+  if (!terminalShell) return;
+
+  if (!isTerminalOpen()) {
+    terminalShell.classList.remove('is-hidden');
+    if (!hasBeenOpened) {
+      centerTerminalShell();
+      hasBeenOpened = true;
+    }
+    syncMobileBodyClass();
+  }
+
+  focusTerminal();
+}
+
+/** Hide terminal window. */
+function closeTerminal() {
+  if (!terminalShell) return;
+
+  terminalShell.classList.add('is-hidden');
+  syncMobileBodyClass();
+}
+
+/** Open terminal if needed, then run neofetch (used by info shortcut). */
+function openTerminalWithNeofetch() {
+  openTerminal();
+  runTerminalCommand('neofetch');
+}
+
+// =============================================================================
+// Title bar drag (desktop only)
+// =============================================================================
+
+function bindTerminalDrag() {
+  if (!terminalTitleBar || !terminalShell) return;
+
+  terminalTitleBar.addEventListener('pointerdown', (e) => {
+    if (isMobileView()) return;
+    if (e.target.closest('.window-controls')) return;
+
+    e.preventDefault();
+
+    const rect = terminalShell.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
+    terminalShell.classList.add('is-dragging');
+    terminalTitleBar.setPointerCapture(e.pointerId);
+
+    const onMove = (ev) => {
+      const bounds = getViewportBounds();
+      let left = ev.clientX - offsetX;
+      let top = ev.clientY - offsetY;
+      left = Math.max(-rect.width + 80, Math.min(left, bounds.width - 80));
+      top = Math.max(0, Math.min(top, bounds.height - TITLE_BAR_HEIGHT));
+      terminalShell.style.left = `${left}px`;
+      terminalShell.style.top = `${top}px`;
+    };
+
+    const onUp = (ev) => {
+      terminalTitleBar.releasePointerCapture(ev.pointerId);
+      terminalShell.classList.remove('is-dragging');
+      terminalTitleBar.removeEventListener('pointermove', onMove);
+      terminalTitleBar.removeEventListener('pointerup', onUp);
+      terminalTitleBar.removeEventListener('pointercancel', onUp);
+    };
+
+    terminalTitleBar.addEventListener('pointermove', onMove);
+    terminalTitleBar.addEventListener('pointerup', onUp);
+    terminalTitleBar.addEventListener('pointercancel', onUp);
+  });
+}
+
+// =============================================================================
+// Command resolution (six commands only)
+// =============================================================================
+
+function resolveCommand(input) {
+  const cmd = input.trim();
+
+  if (cmd === 'clear') {
+    return { action: 'clear' };
+  }
+
+  if (cmd === 'rm -rf /') {
+    return { action: 'blackout' };
+  }
+
+  const commands = {
+    help: { text: COMMAND_HELP, style: 'normal' },
+    whoami: { text: 'guest', style: 'normal' },
+    date: { text: new Date().toString(), style: 'normal' },
+    neofetch: { text: NEOFETCH_BANNER, style: 'normal' },
+  };
+
+  if (commands[cmd]) {
+    return commands[cmd];
+  }
+
+  return {
+    text: `command not found: ${cmd}\nType 'help' for available commands.`,
+    style: 'error',
+  };
+}
+
+function applyResponseStyle(element, style) {
+  element.style.color = style === 'error' ? 'var(--error-color)' : 'var(--text-color)';
 }
 
 function escapeHTML(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function buildEmailLink() {
-  const email = `${emailUser}@${emailDomain}.${emailTld}`;
-  const link = document.createElement('a');
-  link.href = `mailto:${email}`;
-  link.textContent = `${emailUser} [at] ${emailDomain} [dot] ${emailTld}`;
-  link.style.color = 'var(--prompt-color)';
-  link.style.textDecoration = 'underline';
-  link.style.userSelect = 'text';
-  return link;
+/** Scroll terminal output to the bottom. */
+function scrollTerminalToBottom() {
+  terminal.scrollTop = terminal.scrollHeight;
 }
 
-function buildLinkedinLink() {
-  const link = document.createElement('a');
-  link.href = linkedinUrl;
-  link.textContent = linkedinUrl;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.style.color = 'var(--prompt-color)';
-  link.style.textDecoration = 'underline';
-  link.style.userSelect = 'text';
-  return link;
-}
+/**
+ * Execute a command: echo input line, run handler, print output instantly.
+ * @param {string} command - Trimmed command string
+ * @param {string} [rawInput] - Original input (for history echo)
+ */
+function runTerminalCommand(command, rawInput = command) {
+  if (command === '') return;
 
-function bindUiHandlers() {
-  if (fileIcon) {
-    fileIcon.addEventListener('click', () => {
-      openFile();
-    });
+  const commandEcho = document.createElement('div');
+  commandEcho.className = 'line';
+  commandEcho.innerHTML = `<span class="prompt-prefix">guest@ubuntu:~$</span> <span style="user-select: text;">${escapeHTML(rawInput)}</span>`;
+  historyEl.appendChild(commandEcho);
+
+  hiddenInput.value = '';
+  visualInput.textContent = '';
+
+  const result = resolveCommand(command);
+
+  if (result.action === 'clear') {
+    historyEl.replaceChildren();
+    scrollTerminalToBottom();
+    focusTerminal();
+    return;
   }
 
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      closeTerminal();
-    });
+  if (result.action === 'blackout') {
+    blackout?.classList.remove('is-hidden');
+    blackout?.setAttribute('aria-hidden', 'false');
+    hiddenInput.disabled = true;
+    return;
   }
 
-  terminal.addEventListener('click', () => {
+  const response = document.createElement('div');
+  response.className = 'line';
+  response.textContent = result.text;
+  applyResponseStyle(response, result.style);
+  historyEl.appendChild(response);
+
+  scrollTerminalToBottom();
+  focusTerminal();
+}
+
+// =============================================================================
+// Input handling
+// =============================================================================
+
+function bindTerminalInput() {
+  hiddenInput.addEventListener('input', () => {
+    visualInput.textContent = hiddenInput.value;
+    scrollTerminalToBottom();
+  });
+
+  hiddenInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !hiddenInput.disabled) {
+      const rawInput = hiddenInput.value;
+      const command = rawInput.trim();
+      if (command === '') return;
+      runTerminalCommand(command, rawInput);
+    }
+  });
+
+  terminal?.addEventListener('click', () => {
     focusTerminal();
   });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  bindUiHandlers();
-  syncLayoutWithViewport();
-  if (!isMobileView()) {
-    hiddenInput.focus();
+// =============================================================================
+// Desktop shortcuts & window chrome
+// =============================================================================
+
+function bindDesktopIcons() {
+  terminalShortcut?.addEventListener('click', () => {
+    if (isTerminalOpen()) {
+      focusTerminal();
+    } else {
+      openTerminal();
+    }
+  });
+
+  infoShortcut?.addEventListener('click', () => {
+    openTerminalWithNeofetch();
+  });
+}
+
+function bindTerminalClose() {
+  terminalCloseBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeTerminal();
+  });
+}
+
+function onViewportResize() {
+  if (isMobileView()) return;
+  if (isTerminalOpen() && hasBeenOpened) {
+    ensureTerminalOnScreen();
   }
-});
+}
 
-window.addEventListener('resize', syncLayoutWithViewport);
+// =============================================================================
+// Init — terminal hidden on load (desktop and mobile)
+// =============================================================================
 
+bindDesktopIcons();
+bindTerminalClose();
+bindTerminalDrag();
+bindTerminalInput();
+window.addEventListener('resize', onViewportResize);
