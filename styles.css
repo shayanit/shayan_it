@@ -204,6 +204,16 @@ body {
   user-select: text;
 }
 
+.terminal-link {
+  color: var(--prompt-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.terminal-link:hover {
+  color: var(--white);
+}
+
 .prompt-line {
   display: flex;
   align-items: flex-start;

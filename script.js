@@ -17,19 +17,25 @@ function getEmail() {
   return `${emailUser}@${emailDomain}.${emailTld}`;
 }
 
-/** Multi-line system info block for the neofetch command. */
-function buildNeofetchBanner() {
-  return `${profile.name}
-------------------
-Role: ${profile.role}
-Location: ${profile.location}
-Stack: ${profile.stack}
-Education: ${profile.education}
-Email: ${getEmail()}
-LinkedIn: ${profile.linkedin}`;
+function getLinkedInUrl() {
+  const url = profile.linkedin.trim();
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
-const NEOFETCH_BANNER = buildNeofetchBanner();
+/** Multi-line system info block for the neofetch command (with clickable links). */
+function buildNeofetchBannerHTML() {
+  const email = getEmail();
+  return `${escapeHTML(profile.name)}
+------------------
+Role: ${escapeHTML(profile.role)}
+Location: ${escapeHTML(profile.location)}
+Stack: ${escapeHTML(profile.stack)}
+Education: ${escapeHTML(profile.education)}
+Email: <a href="mailto:${escapeHTML(email)}" class="terminal-link">${escapeHTML(email)}</a>
+LinkedIn: <a href="${escapeHTML(getLinkedInUrl())}" class="terminal-link" target="_blank" rel="noopener noreferrer">${escapeHTML(profile.linkedin)}</a>`;
+}
+
+const NEOFETCH_BANNER_HTML = buildNeofetchBannerHTML();
 
 const COMMAND_HELP = `Available commands:
   help        Show this help message
@@ -223,7 +229,7 @@ function resolveCommand(input) {
     help: { text: COMMAND_HELP, style: 'normal' },
     whoami: { text: 'guest', style: 'normal' },
     date: { text: new Date().toString(), style: 'normal' },
-    neofetch: { text: NEOFETCH_BANNER, style: 'normal' },
+    neofetch: { html: NEOFETCH_BANNER_HTML, style: 'normal' },
   };
 
   if (commands[cmd]) {
@@ -283,7 +289,11 @@ function runTerminalCommand(command, rawInput = command) {
 
   const response = document.createElement('div');
   response.className = 'line';
-  response.textContent = result.text;
+  if (result.html) {
+    response.innerHTML = result.html;
+  } else {
+    response.textContent = result.text;
+  }
   applyResponseStyle(response, result.style);
   historyEl.appendChild(response);
 
