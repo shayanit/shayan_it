@@ -13,19 +13,20 @@ const emailTld = 'it';
 
 const profile = JSON.parse(document.getElementById('profile-data').textContent);
 
-/** Hostname line shown at top of neofetch output. */
-function getHostLine() {
+function getEmail() {
   return `${emailUser}@${emailDomain}.${emailTld}`;
 }
 
 /** Multi-line system info block for the neofetch command. */
 function buildNeofetchBanner() {
-  return `${getHostLine()}
+  return `${profile.name}
 ------------------
 Role: ${profile.role}
 Location: ${profile.location}
 Stack: ${profile.stack}
-Education: ${profile.education}`;
+Education: ${profile.education}
+Email: ${getEmail()}
+LinkedIn: ${profile.linkedin}`;
 }
 
 const NEOFETCH_BANNER = buildNeofetchBanner();
