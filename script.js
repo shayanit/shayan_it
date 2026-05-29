@@ -62,8 +62,9 @@ const blackout = document.getElementById('blackout');
 
 // Layout constants for centering and drag clamping
 const TITLE_BAR_HEIGHT = 35;
-const DEFAULT_SHELL_WIDTH = 700;
-const DEFAULT_SHELL_HEIGHT_RATIO = 0.65;
+const DEFAULT_SHELL_WIDTH = 850;
+/** Landscape terminal: width slightly less stretched than 2:1 */
+const TERMINAL_ASPECT_RATIO = 7 / 4;
 
 /** True when viewport is treated as mobile (full-screen terminal, no drag). */
 function isMobileView() {
@@ -109,8 +110,17 @@ function centerTerminalShell() {
   if (isMobileView() || !terminalShell) return;
 
   const bounds = getViewportBounds();
-  const width = Math.min(DEFAULT_SHELL_WIDTH, bounds.width - 40);
-  const height = Math.min(bounds.height * DEFAULT_SHELL_HEIGHT_RATIO, bounds.height - 40);
+  const maxWidth = bounds.width - 40;
+  const maxHeight = bounds.height - 40;
+
+  let width = Math.min(DEFAULT_SHELL_WIDTH, maxWidth);
+  let height = width / TERMINAL_ASPECT_RATIO;
+
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * TERMINAL_ASPECT_RATIO;
+  }
+
   const left = (bounds.width - width) / 2;
   const top = (bounds.height - height) / 2;
 

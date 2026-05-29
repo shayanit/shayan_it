@@ -98,7 +98,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 850px;
-  height: 75vh;
+  aspect-ratio: 7 / 4;
   max-width: calc(100vw - 40px);
   max-height: calc(100vh - 40px);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.65);
